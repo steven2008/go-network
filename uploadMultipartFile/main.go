@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
+	"io"
 	"time"
+	"io/ioutil"
+	"path/filepath"
 )
 
 func main() {
@@ -33,6 +34,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("fh err", err)
 		}
 		defer fh.Close()
+
 		imageBuf, err := ioutil.ReadAll(fh)
 		if err != nil {
 			fmt.Println("imageBuf err", err)
@@ -53,5 +55,14 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println("WriteFile err", err)
 		}
+		ff, err := handler.Open()
+		//第二种方式保存图片
+		f, err := os.OpenFile("/Volumes/Macintosh HD/Users/rockonterol/Desktop/ss/"+handler.Filename+".jpg", os.O_WRONLY|os.O_CREATE, 0777)
+		if err != nil {
+			fmt.Println("OpenFile err", err)
+		}
+		defer f.Close()
+		io.Copy(f, ff)
+
 	}
 }
